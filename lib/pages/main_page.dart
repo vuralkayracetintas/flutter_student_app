@@ -17,6 +17,9 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final studentRepository = ref.watch(studentsProvider);
     final teacherRepository = ref.watch(teachersProvider);
+    var backGroundImage = false;
+    final firebasePhoto = FirebaseAuth.instance.currentUser!.photoURL!;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 207, 131, 220),
@@ -58,18 +61,25 @@ class HomePage extends ConsumerWidget {
         child: ListView(
           children: [
             DrawerHeader(
-                child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 30,
-                  backgroundImage: NetworkImage(
-                      FirebaseAuth.instance.currentUser!.photoURL!),
-                ),
-                const SizedBox(width: 10),
-                //Image.network(FirebaseAuth.instance.currentUser!.photoURL!),
-                Text(FirebaseAuth.instance.currentUser!.displayName!),
-              ],
-            )),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      CircleAvatar(
+                          radius: 30,
+                          backgroundImage: NetworkImage(firebasePhoto)),
+                      const SizedBox(width: 10),
+                      Text(FirebaseAuth.instance.currentUser!.displayName!),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(FirebaseAuth.instance.currentUser!.email!),
+                ],
+              ),
+            ),
             ListTile(
               title: const Text('Students'),
               onTap: () {

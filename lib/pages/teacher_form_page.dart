@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:studentcom/models/teacher.dart';
@@ -91,6 +93,7 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
                       }
                     },
                   ),
+                  SizedBox(height: 70),
                   isSaving
                       ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
@@ -136,5 +139,9 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
 
   Future<void> reelSave() async {
     await ref.read(dataServiceProvider).addTeacher(Teacher.fromMap(inputVal));
+  }
+
+  void asknda() {
+    CircularProgressIndicator();
   }
 }
