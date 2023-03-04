@@ -21,3 +21,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+//Todo uygulama kamera erisimi ios icin yok 
+

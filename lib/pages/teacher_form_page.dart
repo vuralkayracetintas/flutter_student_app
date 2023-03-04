@@ -15,6 +15,7 @@ class TeacherFormPage extends ConsumerStatefulWidget {
 class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
   final Map<String, dynamic> inputVal = {};
   final _formKey = GlobalKey<FormState>();
+
   bool isSaving = false;
   @override
   Widget build(BuildContext context) {
@@ -33,11 +34,15 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
                     decoration: const InputDecoration(
                       label: Text('name'),
                     ),
-                    validator: (value) {
-                      if (value?.isNotEmpty != true) {
-                        return 'name cannot be empty';
-                      }
-                    },
+
+                    validator: FormFieldValidator().isNotEmpty,
+                    // (value) {
+                    //   if (value?.isNotEmpty ?? false) {
+                    //     return null;
+                    //   } else {
+                    //     return 'name cannot be empty';
+                    //   }
+                    // },
                     onSaved: (newValue) {
                       inputVal['name'] = newValue;
                     },
@@ -93,7 +98,7 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
                       }
                     },
                   ),
-                  SizedBox(height: 70),
+                  const SizedBox(height: 70),
                   isSaving
                       ? const Center(child: CircularProgressIndicator())
                       : ElevatedButton(
@@ -116,24 +121,23 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
 
   Future<void> _save() async {
     bool finish = false;
-    while (!finish) {
-      try {
-        setState(() {
-          isSaving = true;
-        });
-        await reelSave();
-        finish = true;
-        Navigator.of(context).pop(true);
-      } catch (e) {
-        final snackBar = ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
-        await snackBar.closed;
-      } finally {
-        setState(() {
-          isSaving = false;
-        });
-      }
+
+    try {
+      setState(() {
+        isSaving = true;
+      });
+      await reelSave();
+      finish = true;
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      final snackBar = ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+      await snackBar.closed;
+    } finally {
+      setState(() {
+        isSaving = false;
+      });
     }
   }
 
@@ -142,6 +146,16 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
   }
 
   void asknda() {
-    CircularProgressIndicator();
+    const CircularProgressIndicator();
   }
+}
+
+class FormFieldValidator {
+  String? isNotEmpty(String? value) {
+    return (value?.isNotEmpty ?? false) ? null : ValidatorString._notEmpyt;
+  }
+}
+
+class ValidatorString {
+  static const _notEmpyt = 'name cannot be em';
 }

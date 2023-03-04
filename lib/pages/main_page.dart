@@ -1,6 +1,12 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:studentcom/pages/message_page.dart';
 import 'package:studentcom/pages/splash_screen.dart';
 import 'package:studentcom/pages/student_page.dart';
@@ -18,7 +24,6 @@ class HomePage extends ConsumerWidget {
     final studentRepository = ref.watch(studentsProvider);
     final teacherRepository = ref.watch(teachersProvider);
     var backGroundImage = false;
-    final firebasePhoto = FirebaseAuth.instance.currentUser!.photoURL!;
 
     return Scaffold(
       appBar: AppBar(
@@ -60,26 +65,7 @@ class HomePage extends ConsumerWidget {
       drawer: Drawer(
         child: ListView(
           children: [
-            DrawerHeader(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      CircleAvatar(
-                          radius: 30,
-                          backgroundImage: NetworkImage(firebasePhoto)),
-                      const SizedBox(width: 10),
-                      Text(FirebaseAuth.instance.currentUser!.displayName!),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Text(FirebaseAuth.instance.currentUser!.email!),
-                ],
-              ),
-            ),
+            UserDrawerHeader(),
             ListTile(
               title: const Text('Students'),
               onTap: () {
@@ -131,5 +117,99 @@ class HomePage extends ConsumerWidget {
   void _goTeacherPage(BuildContext context) {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (context) => const TeacherPage()));
+  }
+}
+
+class UserDrawerHeader extends StatefulWidget {
+  const UserDrawerHeader({
+    super.key,
+  });
+
+  @override
+  State<UserDrawerHeader> createState() => _UserDrawerHeaderState();
+}
+
+class _UserDrawerHeaderState extends State<UserDrawerHeader> {
+  Future<Uint8List?>? _ppicFuture;
+  @override
+  void initState() {
+    super.initState();
+    _ppicFuture = _ppicDownload();
+  }
+
+  Future<Uint8List?> _ppicDownload() async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final documentSnapshot =
+        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final userRecMap = documentSnapshot.data();
+    if (userRecMap == null) return null;
+    if (userRecMap.containsKey('ppicref')) {
+      Uint8List? uint8list =
+          await FirebaseStorage.instance.ref(userRecMap['ppicref']).getData();
+      return uint8list;
+    }
+    //FirebaseStorage.instance.ref('ppics').child('$uid.jpg');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DrawerHeader(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () async {
+                  XFile? xFile =
+                      await ImagePicker().pickImage(source: ImageSource.camera);
+                  if (xFile == null) return;
+                  final imagePath = xFile.path;
+                  final uid = FirebaseAuth.instance.currentUser!.uid;
+                  final ppicref = await FirebaseStorage.instance
+                      .ref('ppic')
+                      .child('$uid.jpg');
+
+                  await ppicref.putFile(File(imagePath));
+                  FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(uid)
+                      .update({'ppicred': ppicref.fullPath});
+
+                  setState(() {
+                    _ppicFuture = _ppicDownload();
+                  });
+                },
+                child: FutureBuilder<Uint8List?>(
+                    future: _ppicFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        final picInMemory = snapshot.data!;
+                        return CircleAvatar(
+                          radius: 30,
+                          backgroundImage: MemoryImage(picInMemory),
+                        );
+                      }
+                      return CircleAvatar(
+                        radius: 30,
+                        child: Text(FirebaseAuth
+                                .instance.currentUser!.displayName![0] +
+                            FirebaseAuth.instance.currentUser!.displayName![6] +
+                            FirebaseAuth
+                                .instance.currentUser!.displayName![12]),
+                      );
+                    }),
+              ),
+              const SizedBox(width: 10),
+              Text(FirebaseAuth.instance.currentUser!.displayName!),
+            ],
+          ),
+          const SizedBox(height: 20),
+          Text(FirebaseAuth.instance.currentUser!.email!),
+        ],
+      ),
+    );
   }
 }
