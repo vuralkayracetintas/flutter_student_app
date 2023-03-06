@@ -142,10 +142,12 @@ class _UserDrawerHeaderState extends State<UserDrawerHeader> {
     final documentSnapshot =
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
     final userRecMap = documentSnapshot.data();
+
     if (userRecMap == null) return null;
     if (userRecMap.containsKey('ppicref')) {
+      var ppicRef = userRecMap['ppicref'];
       Uint8List? uint8list =
-          await FirebaseStorage.instance.ref(userRecMap['ppicref']).getData();
+          await FirebaseStorage.instance.ref(ppicRef).getData();
       return uint8list;
     }
     //FirebaseStorage.instance.ref('ppics').child('$uid.jpg');
