@@ -85,6 +85,7 @@ class TeacherDownloadButton extends StatefulWidget {
 
 class _TeacherDownloadButtonState extends State<TeacherDownloadButton> {
   bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (context, ref, child) {
