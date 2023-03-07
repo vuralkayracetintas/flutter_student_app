@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:studentcom/pages/message_page.dart';
@@ -190,10 +193,7 @@ class _UserDrawerHeaderState extends State<UserDrawerHeader> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData && snapshot.data != null) {
                         final picInMemory = snapshot.data!;
-                        return CircleAvatar(
-                          radius: 30,
-                          backgroundImage: MemoryImage(picInMemory),
-                        );
+                        return MovingAvatar(picInMemory: picInMemory);
                       }
                       return CircleAvatar(
                         radius: 30,
@@ -209,6 +209,62 @@ class _UserDrawerHeaderState extends State<UserDrawerHeader> {
           const SizedBox(height: 20),
           Text(FirebaseAuth.instance.currentUser!.email!),
         ],
+      ),
+    );
+  }
+}
+
+class MovingAvatar extends StatefulWidget {
+  const MovingAvatar({
+    super.key,
+    required this.picInMemory,
+  });
+
+  final Uint8List picInMemory;
+
+  @override
+  State<MovingAvatar> createState() => _MovingAvatarState();
+}
+
+class _MovingAvatarState extends State<MovingAvatar>
+    with SingleTickerProviderStateMixin<MovingAvatar> {
+  late Ticker _ticker;
+  double animationLocation = 0.0;
+  double askdja = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = createTicker((Duration elapsed) {
+      final angel = pi *
+          elapsed.inMicroseconds /
+          const Duration(seconds: 1).inMicroseconds;
+      setState(() {
+        animationLocation = sin(angel) * 30 + 30;
+        askdja = sin(angel) * 30 + 30;
+        //print(sin(angel) * 30 + 100);
+      });
+    });
+    _ticker.start();
+
+    // Timer(const Duration(seconds: 6), () {
+    //   _ticker.stop();
+    // });
+  }
+
+  @override
+  void dispose() {
+    _ticker.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(left: animationLocation),
+      child: CircleAvatar(
+        radius: 30,
+        backgroundImage: MemoryImage(widget.picInMemory),
       ),
     );
   }
