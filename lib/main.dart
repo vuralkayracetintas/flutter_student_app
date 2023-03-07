@@ -22,6 +22,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-//TODO: uygulama kamera erisimi ios icin yok 
 
+// TODO : button hero 
 

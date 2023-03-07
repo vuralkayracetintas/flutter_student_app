@@ -6,14 +6,12 @@ import 'package:studentcom/services/data_services.dart';
 import '../models/teacher.dart';
 
 class TeacherRepository extends ChangeNotifier {
-  List<Teacher> teachers = [
-    Teacher('Burak', 'Can', 12, 'male'),
-    Teacher('Cagatay', 'Ay', 12, 'male'),
-    Teacher('Zehra', 'Cetin', 12, 'female'),
-    Teacher('Kubra', 'Turgut', 12, 'female'),
-    Teacher('Ilayda', 'Can', 12, 'female')
-  ];
-
+  List<Teacher> teachers = [];
+// Teacher('Burak', 'Can', 12, 'male'),
+  // Teacher('Cagatay', 'Ay', 12, 'male'),
+  // Teacher('Zehra', 'Cetin', 12, 'female'),
+  // Teacher('Kubra', 'Turgut', 12, 'female'),
+  // Teacher('Ilayda', 'Can', 12, 'female')
   final DataServices dataServices;
   TeacherRepository(this.dataServices);
   Future<void> download() async {

@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:rive/rive.dart';
 import 'package:studentcom/pages/message_page.dart';
 import 'package:studentcom/pages/splash_screen.dart';
 import 'package:studentcom/pages/student_page.dart';
@@ -35,8 +36,22 @@ class HomePage extends ConsumerWidget {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // const SizedBox(
+            //   height: 200,
+            //   width: 200,
+            //   child: RiveAnimation.asset(
+            //       'assets/animation/4342-8934-google-developer-student-clubs.riv'),
+            // ),
+            const SizedBox(
+              height: 200,
+              width: 500,
+              child: RiveAnimation.asset(
+                  'assets/animation/2335-4701-automatic-figma-to-flutter.riv'),
+            ),
+            Text('${teacherRepository.teachers.length}'),
             TextButton(
               onPressed: () {
                 _goMessagePage(context);
@@ -59,8 +74,13 @@ class HomePage extends ConsumerWidget {
               onPressed: () {
                 _goTeacherPage(context);
               },
-              child: Text('${teacherRepository.teachers.length} Teacher',
-                  style: const TextStyle(color: Colors.white)),
+              child: Hero(
+                tag: 'teacherButton',
+                child: Material(
+                  child: Text('${teacherRepository.teachers.length} Teacher',
+                      style: const TextStyle(color: Colors.white)),
+                ),
+              ),
             ),
           ],
         ),
@@ -183,10 +203,8 @@ class _UserDrawerHeaderState extends State<UserDrawerHeader> {
                       .collection('users')
                       .doc(uid)
                       .update({'ppicred': ppicref.fullPath});
-
-                  setState(() {
-                    _ppicFuture = _ppicDownload();
-                  });
+                  _ppicFuture = _ppicDownload();
+                  setState(() {});
                 },
                 child: FutureBuilder<Uint8List?>(
                     future: _ppicFuture,

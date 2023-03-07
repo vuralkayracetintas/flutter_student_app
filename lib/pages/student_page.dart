@@ -50,23 +50,32 @@ class StudentRow extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var seviyorMuyum = ref.watch(studentsProvider).doILove(student);
     return ListTile(
-      title: Text('${student.name} ${student.surname}'),
-      leading: IntrinsicWidth(
-        child: Center(
-          child: Text(
-            student.gender == 'female' ? '🤵🏼‍♀️' : '👨🏼‍💼',
-            style: const TextStyle(fontSize: 30),
+        title: AnimatedPadding(
+            duration: const Duration(seconds: 1),
+            padding: seviyorMuyum
+                ? const EdgeInsets.only(left: 30)
+                : const EdgeInsets.only(),
+            curve: Curves.bounceIn, // animasyon degistirilebilir
+            child: Text('${student.name} ${student.surname}')),
+        leading: IntrinsicWidth(
+          child: Center(
+            child: Text(
+              student.gender == 'female' ? '🤵🏼‍♀️' : '👨🏼‍💼',
+              style: const TextStyle(fontSize: 30),
+            ),
           ),
         ),
-      ),
-      trailing: IconButton(
+        trailing: IconButton(
           onPressed: () {
             ref.read(studentsProvider).love(student, !seviyorMuyum);
           },
-          icon: Icon(
-            seviyorMuyum ? Icons.favorite : Icons.favorite_border,
-            color: Colors.red,
-          )),
-    );
+          icon: AnimatedCrossFade(
+              firstChild: const Icon(Icons.favorite),
+              secondChild: const Icon(Icons.favorite_border_outlined),
+              crossFadeState: seviyorMuyum
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: const Duration(milliseconds: 400)),
+        ));
   }
 }

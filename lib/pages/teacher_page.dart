@@ -23,7 +23,14 @@ class TeacherPage extends ConsumerWidget {
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 32, horizontal: 32),
-                  child: Text('${teacherRepository.teachers.length}  Teacher'),
+                  child: Hero(
+                    tag: 'teacherButton',
+                    child: Material(
+                      color: Colors.transparent,
+                      child:
+                          Text('${teacherRepository.teachers.length} Teacher'),
+                    ),
+                  ),
                 ),
               ),
               const Align(
@@ -37,6 +44,7 @@ class TeacherPage extends ConsumerWidget {
               child: RefreshIndicator(
             onRefresh: () async {
               ref.watch(teacherListProvide);
+              ref.read(teachersProvider).download();
             },
             child: ref.watch(teacherListProvide).when(
                   data: (data) => ListView.separated(

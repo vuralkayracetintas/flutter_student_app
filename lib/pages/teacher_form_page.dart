@@ -12,9 +12,14 @@ class TeacherFormPage extends ConsumerStatefulWidget {
   _TeacherFormPageState createState() => _TeacherFormPageState();
 }
 
-class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
+class _TeacherFormPageState extends ConsumerState<TeacherFormPage>
+    with SingleTickerProviderStateMixin {
   final Map<String, dynamic> inputVal = {};
   final _formKey = GlobalKey<FormState>();
+  late final AnimationController _controller = AnimationController(vsync: this);
+
+  final animatedTween = Tween<AlignmentGeometry>(
+      begin: Alignment.centerLeft, end: Alignment.centerRight);
 
   bool isSaving = false;
   @override
@@ -30,6 +35,13 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  ScaleTransition(
+                    scale: _controller,
+                    child: const Icon(
+                      Icons.person,
+                      size: 200,
+                    ),
+                  ),
                   TextFormField(
                     decoration: const InputDecoration(
                       label: Text('name'),
@@ -68,13 +80,19 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
                       if (value == null || value.isNotEmpty != true) {
                         return 'age cannot be empty';
                       }
-                      if (int.parse(value) == null) {
-                        return 'enter int value';
+                      if (int.tryParse(value) == null) {
+                        return 'sayisal deger';
                       }
                     },
                     keyboardType: TextInputType.number,
                     onSaved: (newValue) {
                       inputVal['age'] = int.parse(newValue!);
+                    },
+                    onChanged: (value) {
+                      final v = double.parse(value);
+                      _controller.animateTo(v / 100,
+                          duration: Duration(seconds: 1));
+                      print(v);
                     },
                   ),
                   DropdownButtonFormField(
@@ -101,17 +119,20 @@ class _TeacherFormPageState extends ConsumerState<TeacherFormPage> {
                   const SizedBox(height: 70),
                   isSaving
                       ? const Center(child: CircularProgressIndicator())
-                      : ElevatedButton(
-                          onPressed: () {
-                            final formState = _formKey.currentState;
-                            if (formState == null) return;
-                            if (formState.validate() == true) {
-                              formState.save();
-                              print(inputVal);
-                            }
-                            _save();
-                          },
-                          child: const Text('Save'))
+                      : AlignTransition(
+                          alignment: animatedTween.animate(_controller),
+                          child: ElevatedButton(
+                              onPressed: () {
+                                final formState = _formKey.currentState;
+                                if (formState == null) return;
+                                if (formState.validate() == true) {
+                                  formState.save();
+                                  print(inputVal);
+                                }
+                                _save();
+                              },
+                              child: const Text('Save')),
+                        )
                 ],
               )),
         ),
