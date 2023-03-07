@@ -65,7 +65,7 @@ class HomePage extends ConsumerWidget {
       drawer: Drawer(
         child: ListView(
           children: [
-            UserDrawerHeader(),
+            const UserDrawerHeader(),
             ListTile(
               title: const Text('Students'),
               onTap: () {
@@ -146,6 +146,7 @@ class _UserDrawerHeaderState extends State<UserDrawerHeader> {
     if (userRecMap == null) return null;
     if (userRecMap.containsKey('ppicref')) {
       var ppicRef = userRecMap['ppicref'];
+      // ppicRef = 'ppic/eLpe6NbdqAN3k3rEwklMqBe1Z6z1.jpg';
       Uint8List? uint8list =
           await FirebaseStorage.instance.ref(ppicRef).getData();
       return uint8list;
@@ -196,11 +197,8 @@ class _UserDrawerHeaderState extends State<UserDrawerHeader> {
                       }
                       return CircleAvatar(
                         radius: 30,
-                        child: Text(FirebaseAuth
-                                .instance.currentUser!.displayName![0] +
-                            FirebaseAuth.instance.currentUser!.displayName![6] +
-                            FirebaseAuth
-                                .instance.currentUser!.displayName![12]),
+                        child: Text(
+                            FirebaseAuth.instance.currentUser!.displayName![0]),
                       );
                     }),
               ),
